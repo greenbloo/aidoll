@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: user-service
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: ea7b933f-ce2c-49aa-8f6a-e1e75833d4cb  # 填命名空间ID
+        group: aidoll-dev
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  security:
+    user:
+      name: sa
+      password: 123
+      roles: USER   # 可选，Spring 默认给 USER 角色

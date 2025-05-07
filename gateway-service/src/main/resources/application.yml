@@ -1,0 +1,91 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: gateway-service
+
+  config:
+    import: "optional:nacos:${spring.application.name}.yaml?group=aidoll-dev"
+
+  cloud:
+    nacos:
+      server-addr: 127.0.0.1:8848
+      discovery:
+        namespace: ea7b933f-ce2c-49aa-8f6a-e1e75833d4cb
+        group: aidoll-dev
+      config:
+        namespace: ea7b933f-ce2c-49aa-8f6a-e1e75833d4cb
+        group: aidoll-dev
+        file-extension: yaml
+        name: ${spring.application.name}
+        import-check-enabled: false
+        refresh-enabled: true
+
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      timeout: 2000
+      lettuce.pool:
+        max-active: 10
+        max-idle: 5
+        min-idle: 1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh,prometheus,metrics
+
+  metrics:
+    web:
+      server:
+        request:
+          autotime: true
+    binders:
+      reactor:
+        netty:
+          enabled: true
+    tags:
+      application: gateway-service
+      env: dev
+
+  observations:
+    key-values:
+      region: ${REGION:local}
+
+logging:
+  level:
+    root: INFO
+    org.springframework.data.redis: TRACE
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.gateway.filter: TRACE
+    reactor.netty.http.client: DEBUG
+    org.springframework.cloud.gateway.filter.factory.CircuitBreakerGatewayFilterFactory: DEBUG
+    io.github.resilience4j: DEBUG
+    com.digitalxiaoyao.gateway.application.service.RateLimiterAppService: DEBUG
+    org.springframework.cloud.context.properties.ConfigurationPropertiesRebinder: DEBUG
+
+# ===== OpenTelemetry 追加配置 =====
+otel:
+  resource:
+    # FIX: 整行用双引号包裹，冒号不会再打断解析
+    attributes:
+      service.name: gateway-service
+      service.version: ${project.version:0.0.1-SNAPSHOT}
+      service.namespace: aidoll
+      deployment.environment: dev
+
+  traces:
+    sampler: parentbased_traceidratio
+    sampler.arg: 0.10
+  exporter:
+    otlp:
+      endpoint: http://collector:4317
+      compression: gzip
+  metrics:
+    exporter: none
+  logs:
+    exporter: none
