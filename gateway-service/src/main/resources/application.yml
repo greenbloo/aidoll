@@ -67,6 +67,8 @@ logging:
     io.github.resilience4j: DEBUG
     com.digitalxiaoyao.gateway.application.service.RateLimiterAppService: DEBUG
     org.springframework.cloud.context.properties.ConfigurationPropertiesRebinder: DEBUG
+    io.opentelemetry: DEBUG
+    io.opentelemetry.sdk.autoconfigure: DEBUG
 
 # ===== OpenTelemetry 追加配置 =====
 otel:

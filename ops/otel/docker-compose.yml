@@ -1,0 +1,31 @@
+# ops/otel/docker-compose.yml
+services:
+  collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    command: ["--config=/etc/otel/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"    # OTLP gRPC 接收
+      - "4318:4318"    # OTLP HTTP 接收（可选）
+    restart: unless-stopped
+    networks:
+      - otel
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.56
+    container_name: jaeger
+    # 只开启 Zipkin 接收，不再启动 OTLP
+    command:
+      - "--collector.zipkin.host-port=:9411"
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "9411:9411"    # Zipkin HTTP 接收
+    restart: unless-stopped
+    networks:
+      - otel
+
+networks:
+  otel:
+    driver: bridge

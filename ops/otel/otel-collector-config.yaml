@@ -1,0 +1,29 @@
+# ops/otel/otel-collector-config.yaml
+
+receivers:
+  otlp:
+    protocols:
+      grpc:        # 监听 4317 gRPC OTLP
+        endpoint: "0.0.0.0:4317"
+      http:        # 监听 4318 HTTP OTLP（可选）
+        endpoint: "0.0.0.0:4318"
+
+processors:
+  batch:          # 推荐启用批处理
+
+exporters:
+  zipkin:
+    endpoint: "http://jaeger:9411/api/v2/spans"  # Jaeger Zipkin HTTP 接口
+  debug: {}        # 调试用 exporter，输出到标准输出
+
+service:
+  pipelines:
+    traces:
+      receivers:  [otlp]
+      processors: [batch]
+      exporters:  [zipkin, debug]
+
+    logs:
+      receivers:  [otlp]
+      processors: [batch]
+      exporters:  [debug]
